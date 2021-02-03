@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Author : Fabrizio Pellegrini <fab.pellegr@gmail.com>
+Author : FabrizioPe
 Date   : 2021-02-02
 Purpose: choose the correct article according to user input word
 """
