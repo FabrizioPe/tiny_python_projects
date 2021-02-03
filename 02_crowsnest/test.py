@@ -12,6 +12,7 @@ consonant_words = [
     'zebrafish'
 ]
 vowel_words = ['aviso', 'eel', 'iceberg', 'octopus', 'upbound']
+bad_words = ['7octopus', ',narwhal']
 template = 'Ahoy, Captain, {} {} off the larboard bow!'
 
 
@@ -43,11 +44,11 @@ def test_consonant():
 
 # --------------------------------------------------
 def test_consonant_upper():
-    """brigantine -> a Brigatine"""
+    """brigantine -> A Brigatine"""  # modified previous test (see "going further" section)
 
     for word in consonant_words:
         out = getoutput(f'{prg} {word.title()}')
-        assert out.strip() == template.format('a', word.title())
+        assert out.strip() == template.format('A', word.title())
 
 
 # --------------------------------------------------
@@ -61,8 +62,17 @@ def test_vowel():
 
 # --------------------------------------------------
 def test_vowel_upper():
-    """octopus -> an Octopus"""
+    """octopus -> An Octopus"""  # modified previous test (see "going further" section)
 
     for word in vowel_words:
         out = getoutput(f'{prg} {word.upper()}')
-        assert out.strip() == template.format('an', word.upper())
+        assert out.strip() == template.format('An', word.upper())
+
+
+# --------------------------------------------------
+def test_starts_with_a_letter():
+    """8octopus -> print error message"""  # new test for checking the first letter
+
+    for word in bad_words:
+        out = getoutput(f'{prg} {word}')
+        assert out == "What kind of animal is that, you fool?!?"	
