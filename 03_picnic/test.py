@@ -66,3 +66,22 @@ def test_more_than_two_sorted():
     out = getoutput(f'{prg} {arg} --sorted')
     expected = ('You are bringing apples, bananas, cherries, and dates.')
     assert out.strip() == expected
+
+# --------------------------------------------------
+def test_no_oxford_comma():
+    """output with no Oxford comma"""
+
+    arg = 'bananas apples dates cherries'
+    out = getoutput(f'{prg} {arg} --nocomma')
+    expected = ('You are bringing bananas, apples, dates and cherries.')
+    assert out.strip() == expected
+
+# --------------------------------------------------
+def test_user_separator():
+    """output with separator defined by the user"""
+
+    arg = "bananas apples dates"
+    sep = ':'
+    out = getoutput(f'{prg} {arg} --separator {sep}')
+    expected = 'You are bringing bananas: apples: and dates.'
+    assert out.strip() == expected				
