@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tests for howler.py"""
+"""tests for howler.py [not for the 'going further' version]"""
 
 import os
 import re
@@ -48,6 +48,14 @@ def test_text_stdout():
 
     out = getoutput(f'{prg} "foo bar baz"')
     assert out.strip() == 'FOO BAR BAZ'
+
+
+# --------------------------------------------------
+def test_lower_flag():
+    """Test lower-case flag"""
+
+    out = getoutput(f'{prg} --ee "Foo BAR bAz"')
+    assert out.strip() == 'foo bar baz'
 
 
 # --------------------------------------------------
