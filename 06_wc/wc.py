@@ -3,6 +3,7 @@
 Author : FabrizioPe
 Date   : 2021-02-08
 Purpose: Emulate the already installed word-count program
+        (including w,c,l options)
 """
 
 import argparse
@@ -25,6 +26,21 @@ def get_args():
                         type=argparse.FileType('rt'),
                         default=[sys.stdin])
 
+    parser.add_argument('-c',
+                        '--chars',
+                        help='Count the characters',
+                        action='store_true')
+
+    parser.add_argument('-l',
+                        '--lines',
+                        help='Count the lines',
+                        action='store_true')
+
+    parser.add_argument('-w',
+                        '--words',
+                        help='Count the words',
+                        action='store_true')
+
     return parser.parse_args()
 
 
@@ -44,10 +60,24 @@ def main():
         tot_lines += num_lines
         tot_words += num_words
         tot_bytes += num_bytes
-        print(f'{num_lines:8}{num_words:8}{num_bytes:8} {fh.name}')
+
+        out_string = ''
+        tot_string = ''
+        if args.lines:
+            out_string += f'{num_lines:8}'
+            tot_string += f'{tot_lines:8}'
+        if args.words:
+            out_string += f'{num_words:8}'
+            tot_string += f'{tot_words:8}'
+        if args.chars:
+            out_string += f'{num_bytes:8}'
+            tot_string += f'{tot_bytes:8}'
+        out_string += f' {fh.name}'
+        tot_string += f' total'
+        print(out_string)
 
     if len(args.file) > 1:  # printing total if multiple files given
-        print(f'{tot_lines:8}{tot_words:8}{tot_bytes:8} total')
+        print(tot_string)
 
 
 # --------------------------------------------------
