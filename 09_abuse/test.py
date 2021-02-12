@@ -8,6 +8,7 @@ import string
 from subprocess import getstatusoutput, getoutput
 
 prg = './abuse.py'
+empty = '../inputs/empty.txt'
 
 
 # --------------------------------------------------
@@ -76,6 +77,25 @@ def test_bad_seed():
     rv, out = getstatusoutput(f'{prg} -s {bad}')
     assert rv != 0
     assert re.search(f"invalid int value: '{bad}'", out)
+
+
+# --------------------------------------------------
+def test_empty_adj_file():
+    """empty adjectives file given as input"""
+
+    rv, out = getstatusoutput(f'{prg} -af {empty}')
+    assert rv != 0
+    assert re.search(f'{os.path.basename(empty)} looks empty', out)
+
+
+# --------------------------------------------------
+def test_empty_noun_file():
+    """empty nouns file given as input"""
+
+    rv, out = getstatusoutput(f'{prg} -nf {empty}')
+    assert rv != 0
+
+    assert re.search(f'{os.path.basename(empty)} looks empty', out)
 
 
 # --------------------------------------------------
