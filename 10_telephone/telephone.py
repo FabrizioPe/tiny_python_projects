@@ -95,6 +95,54 @@ def get_args():
 
 
 # --------------------------------------------------
+def random_mutate(word, mutations, no_punct, alpha):
+    """Randomly mutate the word with 'mutations' frequency.
+       If no_punct is true, leave punctuation unaltered."""
+
+    letters = list(word)  # split the current word in a list
+    num_mutations = round(mutations * len(letters))
+    indexes = random.sample(range(len(letters)), num_mutations)
+    for j in indexes:  # mutate the selected letters
+        if no_punct and letters[j] in string.punctuation:
+            continue
+        letters[j] = random.choice(alpha.replace(letters[j], ''))
+
+    return ''.join(letters)
+
+
+# --------------------------------------------------
+def random_insert(word, insertions, no_punct, alpha):
+    """Randomly insert characters in the word with 'insertions' frequency."""
+
+    letters = list(word)
+    if insertions:  # insert random letters at the indicated frequency
+        num_insertions = round(insertions * len(letters))
+        for _ in range(num_insertions):
+            ind_insertions = random.choice(range(len(letters)))
+            if no_punct and letters[ind_insertions] in string.punctuation:
+                continue
+            letters.insert(ind_insertions, random.choice(alpha))
+
+    return ''.join(letters)
+
+
+# --------------------------------------------------
+def random_delete(word, deletions, no_punct):
+    """Randomly delete characters from the word with 'deletions' frequency."""
+
+    letters = list(word)
+    if deletions:  # delete random letters at the indicated frequency
+        num_deletions = round(deletions * len(letters))
+        for _ in range(num_deletions):
+            ind_deletions = random.choice(range(len(letters)))
+            if no_punct and letters[ind_deletions] in string.punctuation:
+                continue
+            del letters[ind_deletions]
+
+    return ''.join(letters)
+
+
+# --------------------------------------------------
 def main():
     """Make a jazz noise here"""
 
@@ -115,32 +163,15 @@ def main():
         alpha = ''.join(sorted(string.ascii_letters + string.punctuation))
 
     words = orig_text.split()
+    # which words will be modified?
     words_ind = random.sample(range(len(words)), round(words_mutations * len(words)))
     # iterate over the selected words of the original text, to mutate them
     for i in words_ind:
-        letters = list(words[i])  # split the current word in a list
-        num_mutations = round(mutations * len(letters))
-        indexes = random.sample(range(len(letters)), num_mutations)
-        for j in indexes:  # mutate the letters in the current word
-            if no_punct and letters[j] in string.punctuation:
-                continue
-            letters[j] = random.choice(alpha.replace(letters[j], ''))
-        if insertions:  # insert random letters at the indicated frequency
-            num_insertions = round(insertions * len(letters))
-            for _ in range(num_insertions):
-                ind_insertions = random.choice(range(len(letters)))
-                if no_punct and letters[ind_insertions] in string.punctuation:
-                    continue
-                letters.insert(ind_insertions, random.choice(alpha))
-        if deletions:  # delete random letters at the indicated frequency
-            num_deletions = round(deletions * len(letters))
-            for _ in range(num_deletions):
-                ind_deletions = random.choice(range(len(letters)))
-                if no_punct and letters[ind_deletions] in string.punctuation:
-                    continue
-                del letters[ind_deletions]
+        mut_word = random_mutate(words[i], mutations, no_punct, alpha)
+        mut_ins_word = random_insert(mut_word, insertions, no_punct, alpha)
+        mut_ins_del_word = random_delete(mut_ins_word, deletions, no_punct)
+        words[i] = mut_ins_del_word
 
-        words[i] = ''.join(letters)  # aggregate the letters in a word again
     mutated_text = ' '.join(words)
 
     # output
