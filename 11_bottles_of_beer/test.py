@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """tests for bottles.py"""
 
-import hashlib
+# import hashlib
 import os
 import random
 import re
@@ -32,7 +32,7 @@ def test_usage():
 def test_bad_int():
     """Bad integer value"""
 
-    bad = random.randint(-10, 1)
+    bad = random.randint(-10, 0)
     rv, out = getstatusoutput(f'{prg} -n {bad}')
     assert rv != 0
     assert re.search(f'--num "{bad}" must be greater than 0', out)
@@ -59,11 +59,21 @@ def test_str():
 
 
 # --------------------------------------------------
+def test_too_many_beers():
+    """The program can handle 10 beers at max when going down"""
+
+    bad = random.randint(11, 99)
+    rv, out = getstatusoutput(f'{prg} -n {bad}')
+    assert rv != 0
+    assert re.search('No more than 10 beers when going down, please!', out)
+
+
+# --------------------------------------------------
 def test_one():
     """One bottle of beer"""
 
-    expected = ('1 bottle of beer on the wall,\n'
-                '1 bottle of beer,\n'
+    expected = ('One bottle of beer on the wall,\n'
+                'One bottle of beer,\n'
                 'Take one down, pass it around,\n'
                 'No more bottles of beer on the wall!')
 
@@ -76,12 +86,12 @@ def test_one():
 def test_two():
     """Two bottles of beer"""
 
-    expected = ('2 bottles of beer on the wall,\n'
-                '2 bottles of beer,\n'
+    expected = ('Two bottles of beer on the wall,\n'
+                'Two bottles of beer,\n'
                 'Take one down, pass it around,\n'
-                '1 bottle of beer on the wall!\n\n'
-                '1 bottle of beer on the wall,\n'
-                '1 bottle of beer,\n'
+                'One bottle of beer on the wall!\n\n'
+                'One bottle of beer on the wall,\n'
+                'One bottle of beer,\n'
                 'Take one down, pass it around,\n'
                 'No more bottles of beer on the wall!')
 
@@ -91,19 +101,37 @@ def test_two():
 
 
 # --------------------------------------------------
-def test_random():
-    """Random number"""
+def test_step():
+    """Taking down two beers each time"""
 
-    sums = dict(
-        map(lambda x: x.split('\t'),
-            open('sums.txt').read().splitlines()))
+    expected = ('Three bottles of beer on the wall,\n'
+                'Three bottles of beer,\n'
+                'Take two down, pass it around,\n'
+                'One bottle of beer on the wall!\n\n'
+                'One bottle of beer on the wall,\n'
+                'One bottle of beer,\n'
+                'Take two down, pass it around,\n'
+                'No more bottles of beer on the wall!')
 
-    for n in random.choices(list(sums.keys()), k=10):
-        flag = '-n' if random.choice([0, 1]) == 1 else '--num'
-        rv, out = getstatusoutput(f'{prg} {flag} {n}')
-        out += '\n'  # because the last newline is removed
-        assert rv == 0
-        assert hashlib.md5(out.encode('utf-8')).hexdigest() == sums[n]
+    rv, out = getstatusoutput(f'{prg} -n 3 --step 2')
+    assert rv == 0
+    assert out.rstrip() == expected
+
+
+# --------------------------------------------------
+# def test_random():
+#     """Random number"""
+#
+#     sums = dict(
+#         map(lambda x: x.split('\t'),
+#             open('sums.txt').read().splitlines()))
+#
+#     for n in random.choices(list(sums.keys()), k=10):
+#         flag = '-n' if random.choice([0, 1]) == 1 else '--num'
+#         rv, out = getstatusoutput(f'{prg} {flag} {n}')
+#         out += '\n'  # because the last newline is removed
+#         assert rv == 0
+#         assert hashlib.md5(out.encode('utf-8')).hexdigest() == sums[n]
 
 
 # --------------------------------------------------
