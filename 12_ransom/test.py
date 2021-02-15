@@ -38,8 +38,8 @@ def test_text1():
     """Test"""
 
     in_text = 'The quick brown fox jumps over the lazy dog.'
-    tests = [('1', 'thE QUICk BrOWn Fox jumpS OveR tHe LAzY dOg.'),
-             ('3', 'thE quICk BROwn Fox jUmPS OVEr the lAZY DOG.')]
+    tests = [('1', 'Th3 $$1(k |3r$6n$|=ox$jump5 $ve$$t|-|e |_4z$ d$g$'),
+             ('3', 'Th3$qu1(k |3$$wn |=ox j$m|`5$$%3r$the$l4$$$|)$(-.')]
 
     for seed, expected in tests:
         rv, out = getstatusoutput(f'{prg} {seed_flag()} {seed} "{in_text}"')
@@ -54,9 +54,9 @@ def test_text2():
     in_text = 'Now is the time for all good men to come to the aid of the party.'
     tests = [
         ('2',
-         'now iS the TIME fOR ALl good meN TO COMe To THE AID oF THE PArTY.'),
+         'Now$i5$the$+1==3 f$$$4|_l good$me|=| +$$($==e$+o$+|-|3$41|)$o|= +|-|3$|`4r+$.'),
         ('5',
-         'NOw is tHE Time FOr all good men To coME TO tHe AiD OF THe ParTy.')
+         '|=|$w$is t|-|3 +ime |=$r$all$good men$+o co==3 +$ t|-|e$4i|) $|=$+|-|e$|`ar+y$')
     ]
 
     for seed, expected in tests:
@@ -69,8 +69,8 @@ def test_text2():
 def test_file1():
     """Test"""
 
-    tests = [('1', 'thE QUICk BrOWn Fox jumpS OveR tHe LAzY dOg.'),
-             ('3', 'thE quICk BROwn Fox jUmPS OVEr the lAZY DOG.')]
+    tests = [('1', 'Th3 $$1(k |3r$6n$|=ox$jump5 $ve$$t|-|e |_4z$ d$g$'),
+             ('3', 'Th3$qu1(k |3$$wn |=ox j$m|`5$$%3r$the$l4$$$|)$(-.')]
 
     for seed, expected in tests:
         rv, out = getstatusoutput(f'{prg} {seed_flag()} {seed} {fox}')
@@ -84,10 +84,9 @@ def test_file2():
 
     tests = [
         ('2',
-         'now iS the TIME fOR ALl good meN TO COMe To THE AID oF THE PArTY.'),
+         'Now$i5$the$+1==3 f$$$4|_l good$me|=| +$$($==e$+o$+|-|3$41|)$o|= +|-|3$|`4r+$.'),
         ('5',
-         'NOw is tHE Time FOr all good men To coME TO tHe AiD OF THe ParTy.')
-    ]
+         '|=|$w$is t|-|3 +ime |=$r$all$good men$+o co==3 +$ t|-|e$4i|) $|=$+|-|e$|`ar+y$')]
 
     for seed, expected in tests:
         rv, out = getstatusoutput(f'{prg} {seed_flag()} {seed} {now}')

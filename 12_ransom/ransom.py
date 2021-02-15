@@ -2,7 +2,7 @@
 """
 Author : FabrizioPe
 Date   : 2021-02-15
-Purpose: Randomly uppercase letters in a text
+Purpose: Randomly encode letters in a text ('going further')
 """
 
 import argparse
@@ -62,18 +62,25 @@ def main():
 
 # --------------------------------------------------
 def choose(letter):
-    """Randomly uppercase letter"""
-    return letter.upper() if random.choice([0, 1]) else letter.lower()
+    """Randomly encode letter"""
+
+    enc = {'A': '4', 'B': '|3', 'C': '(', 'D': '|)', 'E': '3', 'F': '|=',
+           'G': '(-', 'H': '|-|', 'I': '1', 'J': '_|', 'K': '|<', 'L': '|_',
+           'M': '==', 'N': '|=|', 'P': '|`', 'S': '5', 'T': '+', 'V': '%',
+           'W': '6'}
+
+    return enc.get(letter.upper(), '$') if random.choice([0, 1]) else letter
 
 
 # --------------------------------------------------
 def test_choose():
     state = random.getstate()
     random.seed(1)
-    assert choose('a') == 'a'
-    assert choose('b') == 'b'
-    assert choose('c') == 'C'
-    assert choose('d') == 'd'
+    assert choose('h') == 'h'
+    assert choose('p') == 'p'
+    assert choose('t') == '+'
+    assert choose('w') == 'w'
+    assert choose('b') == '|3'
     random.setstate(state)
 
 
