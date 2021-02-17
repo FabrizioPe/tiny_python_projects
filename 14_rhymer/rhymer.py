@@ -6,8 +6,11 @@ Purpose: Make rhyming words from a given word using regexes
 """
 
 import argparse
+import os
 import re
 import string
+import sys
+from subprocess import getoutput
 
 
 # --------------------------------------------------
@@ -15,17 +18,32 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Make rhyming "words"',
+        description='Make rhyming "words". If you give more than one word,\
+                    an output file for each word will be written.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('str',
                         metavar='str',
-                        help='A word to rhyme')
+                        help='Input string or file')
+
+    parser.add_argument('-o',
+                        '--outfile',
+                        help='Output file [ignored if more than one word given]',
+                        metavar='FILE',
+                        type=argparse.FileType('wt'),
+                        default=sys.stdout)
 
     args = parser.parse_args()
 
-    if ' ' in args.str:
-        parser.error('Please input a single word')
+    # in both cases, get_args returns a list of words
+    if os.path.isfile(args.str):
+        fh = open(args.str)
+        words = [word for line in fh for word in line.split()]
+        words = [word.rstrip(string.punctuation) for word in words]
+        args.str = words
+        fh.close()
+    else:
+        args.str = [word.rstrip(string.punctuation) for word in args.str.split()]
 
     return args
 
@@ -35,20 +53,27 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
-    word = args.str
+    out_fh = args.outfile
+    words = args.str  # reading the list of words from a file or (just one) from stdin
+    if len(words) > 1:
+        getoutput(f'rm {out_fh.name}')
     prefixes = [c for c in string.ascii_lowercase if c not in 'aeiou'] + \
         ('bl br ch cl cr dr fl fr gl gr pl pr sc '
         'sh sk sl sm sn sp st sw th tr tw thw wh wr '
         'sch scr shr sph spl spr squ str thr').split()
 
-    splitted = stemmer(word)
-    if not splitted[1]:
-        print(f'Cannot rhyme "{word}"')
-    else:
-        rhymes = '\n'.join(sorted([prefix + splitted[1] for prefix in prefixes
-                                   if prefix != splitted[0]]))
-
-        print(rhymes)
+    print(words)
+    for word in words:
+        if len(words) > 1:
+            out_fh = open(f'./files/{word}.txt', 'wt')
+        splitted = stemmer(word)
+        if not splitted[1]:
+            print(f'Cannot rhyme "{word}"', file=out_fh)
+        else:
+            rhymes = '\n'.join(sorted([prefix + splitted[1] for prefix in prefixes
+                                       if prefix != splitted[0]]))
+            print(rhymes, file=out_fh)
+        out_fh.close()
 
 
 # --------------------------------------------------
