@@ -40,23 +40,25 @@ def main():
     lines = text.splitlines()  # split the text by lines
     for line in lines:
         # each line is splitted in words according to non-word characters;
-        # then, fry is applied to each word.
+        # then, fry function is applied to each word.
         print(''.join(map(fry, re.split(r'(\W+)', line))))
 
 
 # --------------------------------------------------
 def fry(word: str):
-    """Ex: you -> y'all, cooking -> cookin', swing -> swing,
+    """Ex: you -> y'all, your -> y'all's, cooking -> cookin', swing -> swing,
     wardrobe -> wardrobe"""
 
     if re.match('[Yy]ou$', word):
         return word[0] + "'all"
+    elif re.match('[Yy]our$', word):
+        return word[0] + "'all's"
 
     match = re.search("(.+)ing$", word)  # check if word ends by 'ing'
     if match and re.search('[aeiou]', match.group(1)):  # check if it's a 2 syllables word
         return match.group(1) + "in'"
     else:
-        # it's a 1 syllable word or a 'you' or 'ing'-ending word:
+        # it's a 1 syllable 'ing'-ending word or a regular word:
         # return the word unchanged
         return word
 
@@ -65,6 +67,8 @@ def fry(word: str):
 def test_fry():
     assert fry('you') == "y'all"
     assert fry('You') == "Y'all"
+    assert fry('your') == "y'all's"
+    assert fry('Your') == "Y'all's"
     assert fry('Admiring') == "Admirin'"
     assert fry('cooking') == "cookin'"
     assert fry('swing') == "swing"

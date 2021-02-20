@@ -46,10 +46,11 @@ def test_one_syllable_ing_words():
 
 
 # --------------------------------------------------
-def test_you_yall():
-    """you/y'all"""
+def test_you_your():
+    """you/y'all, your/y'all's"""
 
-    tests = [("you", "y'all"), ("You", "Y'all")]
+    tests = [("you", "y'all"), ("You", "Y'all"), ("your", "y'all's"),
+             ("Your", "Y'all's")]
     for given, expected in tests:
         out = getoutput(f'{prg} {given}')
         assert out.strip() == expected.strip()
