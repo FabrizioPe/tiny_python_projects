@@ -26,7 +26,7 @@ def get_args():
     args = parser.parse_args()
 
     if os.path.isfile(args.str):
-        args.str = open(args.str).read().strip()
+        args.str = open(args.str).read().rstrip()
 
     return args
 
@@ -37,6 +37,13 @@ def main():
 
     args = get_args()
     text = args.str
+
+    # getting ready is a special case (i need to analyse two words)
+    getting_ready = re.findall('[Gg]etting ready', text)
+    for item in getting_ready:
+        preparing = 'Preparing' if item[0] == 'G' else 'preparing'
+        text = text.replace(item, preparing)
+
     lines = text.splitlines()  # split the text by lines
     for line in lines:
         # each line is splitted in words according to non-word characters;
@@ -47,19 +54,29 @@ def main():
 # --------------------------------------------------
 def fry(word: str):
     """Ex: you -> y'all, your -> y'all's, cooking -> cookin', swing -> swing,
-    wardrobe -> wardrobe"""
+    think -> reckon, preparing/getting ready -> fixin'"""
 
     if re.match('[Yy]ou$', word):
         return word[0] + "'all"
     elif re.match('[Yy]our$', word):
         return word[0] + "'all's"
 
+    match = re.match('[Tt]hink(.*)', word)
+    if match:
+        final = match.group(1)
+        if final in ('', 'ing', 's'):
+            word = 'reckon' + final if word[0] == 't' else 'Reckon' + final
+
+    match = re.match('[Pp]repar(.*)', word)
+    if match:
+        final = match.group(1)
+        if final in ('e', 'ing', 'es'):
+            word = 'fix' + final if word[0] == 'p' else 'Fix' + final
+
     match = re.search("(.+)ing$", word)  # check if word ends by 'ing'
-    if match and re.search('[aeiou]', match.group(1)):  # check if it's a 2 syllables word
+    if match and re.search('[aeiou]', match.group(1).lower()):  # check if it's a 2 syllables word
         return match.group(1) + "in'"
     else:
-        # it's a 1 syllable 'ing'-ending word or a regular word:
-        # return the word unchanged
         return word
 
 
@@ -72,6 +89,11 @@ def test_fry():
     assert fry('Admiring') == "Admirin'"
     assert fry('cooking') == "cookin'"
     assert fry('swing') == "swing"
+    assert fry('think') == 'reckon'
+    assert fry('Thinks') == 'Reckons'
+    assert fry('thinking') == "reckonin'"
+    assert fry('preparing') == "fixin'"
+    assert fry('Prepares') == "Fixes"
     assert fry('Microphone') == 'Microphone'
 
 

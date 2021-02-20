@@ -57,6 +57,15 @@ def test_you_your():
 
 
 # --------------------------------------------------
+def getting_ready():
+    """getting ready -> fixin'"""
+    given = 'I am getting ready for Christmas. Getting ready!'
+    expected = "I am fixin' for Christmas. Fixin'!"
+    out = getoutput(f'{prg} {given}')
+    assert out.rstrip() == expected.rstrip()
+
+
+# --------------------------------------------------
 def run_file(file):
     """run with file"""
 
