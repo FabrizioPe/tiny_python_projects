@@ -3,7 +3,8 @@
 Author : FabrizioPe
 Date   : 2021-02-19
 Purpose: Transforming a given text in a deep-US-sounding text, i.e.
-         admiring -> admirin', you -> y'all
+         admiring -> admirin', you -> y'all, getting ready -> fixin',
+         preparing -> fixin'
 """
 
 import argparse
@@ -38,11 +39,9 @@ def main():
     args = get_args()
     text = args.str
 
-    # getting ready is a special case (i need to analyse two words)
-    getting_ready = re.findall('[Gg]etting ready', text)
-    for item in getting_ready:
-        preparing = 'Preparing' if item[0] == 'G' else 'preparing'
-        text = text.replace(item, preparing)
+    # 'Getting ready' is a special case, a 2-words group     
+    text = text.replace("Getting ready", "Preparing")
+    text = text.replace("getting ready", "preparing")     
 
     lines = text.splitlines()  # split the text by lines
     for line in lines:
@@ -70,7 +69,9 @@ def fry(word: str):
     match = re.match('[Pp]repar(.*)', word)
     if match:
         final = match.group(1)
-        if final in ('e', 'ing', 'es'):
+        if final == 'e':
+            word = 'fix' if word[0] == 'p' else 'Fix' 
+        if final in ('ing', 'es'):
             word = 'fix' + final if word[0] == 'p' else 'Fix' + final
 
     match = re.search("(.+)ing$", word)  # check if word ends by 'ing'
