@@ -47,23 +47,18 @@ def main():
 
 # --------------------------------------------------
 def scramble(word):
-    """Sort the middle letters of word into alphabetical order"""
+    """Reverse word: turtle -> eltrut"""
 
-    # words which must remain unchanged
-    if len(word) <= 3 or re.match(r'\W+', word):
-        return word
-
-    middle_part = sorted(list(word[1:-1]))  # extract middle part and sort it alphabetically
-    return word[0] + ''.join(middle_part) + word[-1]
+    return ''.join(reversed(word)) if re.match(r'\w+', word) else word
 
 
 # --------------------------------------------------
 def test_scramble():
-    assert scramble('the') == 'the'
-    assert scramble('an') == 'an'
-    assert scramble('banana') == 'baanna'
-    assert scramble('mountain') == 'mainotun'
-    assert scramble('Telephone') == 'Teehlnope'
+    assert scramble('the') == 'eht'
+    assert scramble('an') == 'na'
+    assert scramble('banana') == 'ananab'
+    assert scramble('mountain') == 'niatnuom'
+    assert scramble('Telephone') == 'enohpeleT'
 
 
 # --------------------------------------------------
