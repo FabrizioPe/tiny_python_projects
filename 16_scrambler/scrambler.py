@@ -49,9 +49,9 @@ def main():
 
     splitter = re.compile("([a-zA-Z](?:[a-zA-Z']*[a-zA-Z])?)")  # compiled once, used a lot
     for line in lines:
-        words = re.split(splitter, line)
-        # print(''.join(map(scramble, words)))
-        print(''.join(([scramble(word) for word in words])))
+        words = splitter.split(line)
+        # print(''.join(map(scramble, words)))  # using map
+        print(''.join(([scramble(word) for word in words])))  # using list comprehension
 
 
 # --------------------------------------------------
