@@ -47,16 +47,19 @@ def main():
     text = args.str
     lines = text.splitlines()  # list of lines (recall that \n is lost!)
 
+    splitter = re.compile("([a-zA-Z](?:[a-zA-Z']*[a-zA-Z])?)")  # compiled once, used a lot
     for line in lines:
-        words = re.split(r'(\W+)', line)
-        # print(words)
-        print(''.join(map(scramble, words)))
+        words = re.split(splitter, line)
+        # print(''.join(map(scramble, words)))
+        print(''.join(([scramble(word) for word in words])))
 
 
 # --------------------------------------------------
 def scramble(word):
     """Return word with randomised middle part"""
-    if len(word) <= 3:
+
+    # words which must remain unchanged
+    if len(word) <= 3 or re.match(r'\W+', word):
         return word
 
     middle_part = list(word[1:-1])
