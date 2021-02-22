@@ -7,7 +7,6 @@ Purpose: Scramble the middle letters of words
 
 import argparse
 import os
-import random
 import re
 
 
@@ -23,13 +22,6 @@ def get_args():
                         metavar='str',
                         help='Input text or file')
 
-    parser.add_argument('-s',
-                        '--seed',
-                        help='Random seed',
-                        metavar='int',
-                        type=int,
-                        default=None)
-
     args = parser.parse_args()
 
     if os.path.isfile(args.str):
@@ -43,7 +35,6 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
-    random.seed(args.seed)
     text = args.str
     lines = text.splitlines()  # list of lines (recall that \n is lost!)
 
@@ -56,26 +47,23 @@ def main():
 
 # --------------------------------------------------
 def scramble(word):
-    """Return word with randomised middle part"""
+    """Sort the middle letters of word into alphabetical order"""
 
     # words which must remain unchanged
     if len(word) <= 3 or re.match(r'\W+', word):
         return word
 
-    middle_part = list(word[1:-1])
-    random.shuffle(middle_part)  # scramble it!
+    middle_part = sorted(list(word[1:-1]))  # extract middle part and sort it alphabetically
     return word[0] + ''.join(middle_part) + word[-1]
 
 
 # --------------------------------------------------
 def test_scramble():
-    state = random.getstate()
-    random.seed(1)
     assert scramble('the') == 'the'
     assert scramble('an') == 'an'
-    assert scramble('hello') == 'hlleo'
-    assert scramble('mountain') == 'maiutonn'
-    random.setstate(state)
+    assert scramble('banana') == 'baanna'
+    assert scramble('mountain') == 'mainotun'
+    assert scramble('Telephone') == 'Teehlnope'
 
 
 # --------------------------------------------------
