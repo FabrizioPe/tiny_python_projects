@@ -2,7 +2,7 @@
 """
 Author : FabrizioPe
 Date   : 2021-02-25
-Purpose: Implementing an ASCII-based gematria
+Purpose: Finding words which are mapped to 666 in give text file
 """
 
 import argparse
@@ -15,7 +15,7 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Gematria',
+        description='Devilish words',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('str',
@@ -35,10 +35,17 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
-    lines = args.str.splitlines()
+    words = args.str.split()
 
-    for line in lines:
-        print(' '.join(map(word2num, line.split())))
+    # finding all the words mapped to 666 through word2num function
+    devilish_words = list(filter(lambda w: word2num(w) == '666', words))
+
+    if devilish_words:
+        print('Devilish words in your text:')
+        for word in devilish_words:
+            print(word)
+    else:
+        print('Such an innocent text!')
 
 
 # --------------------------------------------------
