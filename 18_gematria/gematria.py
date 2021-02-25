@@ -2,12 +2,13 @@
 """
 Author : FabrizioPe
 Date   : 2021-02-25
-Purpose: Finding words which are mapped to 666 in give text file
+Purpose: Find the most frequently occurring value and the corresponding words
 """
 
 import argparse
 import os
 import re
+from collections import Counter
 
 
 # --------------------------------------------------
@@ -15,7 +16,7 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Devilish words',
+        description='Gematria with statistics',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('str',
@@ -37,15 +38,15 @@ def main():
     args = get_args()
     words = args.str.split()
 
-    # finding all the words mapped to 666 through word2num function
-    devilish_words = list(filter(lambda w: word2num(w) == '666', words))
+    # build a list of tuples: [('234', 'hello'), ('97', 'a'), ('195', 'Zi')]
+    num_word = [(word2num(word), re.sub('[^a-zA-Z0-9]', '', word)) for word in words]
+    # statistics
+    num_most_freq = Counter([num for num, _ in num_word]).most_common(1)[0][0]
 
-    if devilish_words:
-        print('Devilish words in your text:')
-        for word in devilish_words:
-            print(word)
-    else:
-        print('Such an innocent text!')
+    print(f'The most frequently occurring value is {num_most_freq}.')
+    print('It corresponds to words:')
+    for num, word in num_word:
+        print(word) if num == num_most_freq else print(end='')
 
 
 # --------------------------------------------------
