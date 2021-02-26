@@ -9,6 +9,7 @@ import argparse
 import csv
 import random
 import re
+from tabulate import tabulate
 
 
 # --------------------------------------------------
@@ -61,19 +62,18 @@ def main():
     random.seed(args.seed)
     csv_reader = csv.reader(args.file)  # csv_reader object
 
-    rows = [row for i, row in enumerate(csv_reader) if i != 0]
-    random_rows = random.sample(rows, args.num)
-    # calculate the width of left column in output
-    lengths = [len(exercise) for exercise, _ in random_rows]
-    lengths.append(10)
-    width = max(lengths)
+    exercises = [row for i, row in enumerate(csv_reader) if i != 0]
+    # randomly select args.num exercises
+    random_exc = random.sample(exercises, args.num)
 
-    # formatted output
-    print('Exercise'.ljust(width) + '  ' + 'Reps'.rjust(6))
-    print('-' * width + '  ' + '------')
-    for exercise, interval in random_rows:
-        reps = random_reps(interval) // 2 if args.easy else random_reps(interval)
-        print(f'{exercise}'.ljust(width) + '  ' + f'{reps}'.rjust(6))
+    wod = []
+    for exc, reps_int in random_exc:
+        reps = random_reps(reps_int) // 2 if args.easy else random_reps(reps_int)
+        wod.append((exc, reps))
+    # the formatting of output is entirely handled by tabulate!!!
+    print(tabulate(wod, headers=('Exercise', 'Reps')))
+
+    args.file.close()
 
 
 # --------------------------------------------------
@@ -81,7 +81,7 @@ def random_reps(interval: str) -> int:
     """Randomly determine reps from a given interval:
        Ex: '30-50' -> 42 """
 
-    matches = re.search('([0-9]+)-([0-9]+)', interval)
+    matches = re.match('([0-9]+)-([0-9]+)', interval)
     return random.randint(int(matches.group(1)), int(matches.group(2)))
 
 
