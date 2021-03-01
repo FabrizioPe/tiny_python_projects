@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
 Author : FabrizioPe
-Date   : 2021-02-26
+Date   : 2021-02-27
 Purpose: Parsing csv files and creating text table output
+         Input files checking included
 """
 
 import argparse
 import csv
-import random
-import re
-from tabulate import tabulate
+import tabulate
+from inputCheck import *
 
 
 # --------------------------------------------------
@@ -59,41 +59,43 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
+    fh = args.file
+
+    # check for all kinds of bad file inputs
+    check_empty(fh)
+    check_headers_only(fh)
+    # actually this func. is a bit too strict considering the program logic
+    check_bad_headers(fh)
+    check_bad_delimiters(fh)
+
+    # if the file passes all the test, we can start the program:
+    fh.seek(0)  # rewind the file
     random.seed(args.seed)
-    csv_reader = csv.reader(args.file)  # csv_reader object
+    csv_reader = csv.reader(args.file)  # create csv_reader object
 
-    exercises = [row for i, row in enumerate(csv_reader) if i != 0]
-    # randomly select args.num exercises
-    random_exc = random.sample(exercises, args.num)
+    # extract all the records with well-formatted second column ('30-55')
+    exercises = well_formatted_reps([row for i, row in enumerate(csv_reader)
+                                     if i != 0])
+    
+    if not exercises:
+        sys.exit(f'No usable data in {fh.name}')
+    
+    # randomly select args.num exercises, if possible
+    if len(exercises) >= args.num:
+        random_exc = random.sample(exercises, args.num)
+    else:
+        sys.exit(f'You cannot extract {args.num} exercises from a '
+                 f'file with {len(exercises)} valid records.')
 
+    # create workout of the day
     wod = []
     for exc, reps_int in random_exc:
         reps = random_reps(reps_int) // 2 if args.easy else random_reps(reps_int)
         wod.append((exc, reps))
     # the formatting of output is entirely handled by tabulate!!!
-    print(tabulate(wod, headers=('Exercise', 'Reps')))
+    print(tabulate.tabulate(wod, headers=('Exercise', 'Reps')))
 
     args.file.close()
-
-
-# --------------------------------------------------
-def random_reps(interval: str) -> int:
-    """Randomly determine reps from a given interval:
-       Ex: '30-50' -> 42 """
-
-    matches = re.match('([0-9]+)-([0-9]+)', interval)
-    return random.randint(int(matches.group(1)), int(matches.group(2)))
-
-
-# --------------------------------------------------
-def test_random_reps():
-    """Test random_reps"""
-    state = random.getstate()
-    random.seed(1)
-    assert random_reps('10-30') == 14
-    assert random_reps('50-90') == 86
-    assert random_reps('25-50') == 50
-    random.setstate(state)
 
 
 # --------------------------------------------------
