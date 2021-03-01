@@ -27,6 +27,13 @@ def get_args():
                         type=argparse.FileType('rt'),
                         default='inputs/exercises.csv')
 
+    parser.add_argument('-d',
+                        '--delimiter',
+                        help=r'Separator in the input file (use t for tab)',
+                        metavar='delim',
+                        type=str,
+                        default=',')
+
     parser.add_argument('-s',
                         '--seed',
                         help='Random seed',
@@ -40,6 +47,12 @@ def get_args():
                         metavar='int',
                         type=int,
                         default=4)
+
+    parser.add_argument('-tf',
+                        '--table_format',
+                        help='Format of output table',
+                        metavar='str',
+                        default='simple')
 
     parser.add_argument('-e',
                         '--easy',
@@ -59,6 +72,7 @@ def main():
     """Make a jazz noise here"""
 
     args = get_args()
+    delim = '\t' if args.delimiter == 't' else args.delimiter
     fh = args.file
 
     # check for all kinds of bad file inputs
@@ -66,12 +80,11 @@ def main():
     check_headers_only(fh)
     # actually this func. is a bit too strict considering the program logic
     check_bad_headers(fh)
-    check_bad_delimiters(fh)
 
     # if the file passes all the test, we can start the program:
     fh.seek(0)  # rewind the file
     random.seed(args.seed)
-    csv_reader = csv.reader(args.file)  # create csv_reader object
+    csv_reader = csv.reader(args.file, delimiter=f"{delim}")  # create csv_reader object
 
     # extract all the records with well-formatted second column ('30-55')
     exercises = well_formatted_reps([row for i, row in enumerate(csv_reader)
@@ -93,7 +106,8 @@ def main():
         reps = random_reps(reps_int) // 2 if args.easy else random_reps(reps_int)
         wod.append((exc, reps))
     # the formatting of output is entirely handled by tabulate!!!
-    print(tabulate.tabulate(wod, headers=('Exercise', 'Reps')))
+    print(tabulate.tabulate(wod, headers=('Exercise', 'Reps'),
+                            tablefmt=f'{args.table_format}'))
 
     args.file.close()
 
