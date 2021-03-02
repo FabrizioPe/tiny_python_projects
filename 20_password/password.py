@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Author : FabrizioPe
-Date   : 2021-03-01
-Purpose: Password maker
+Date   : 2021-03-02
+Purpose: Password maker ('going further' point 1)
 """
 
 import argparse
@@ -65,7 +65,23 @@ def get_args():
                         help='Obfuscate letters',
                         action='store_true')
 
-    return parser.parse_args()
+    parser.add_argument('-p',
+                        '--percentage',
+                        metavar='percent',
+                        help='Percent. of letters to obfuscate in l33t (interval (0,1])',
+                        type=float,
+                        default=1.0)
+
+    args = parser.parse_args()
+
+    if not args.l33t and args.percentage != 1.0:
+        parser.error(f'You can enforce --percentage '
+                     f'only if l33t option is active')
+
+    if args.percentage <= 0 or args.percentage > 1.0:
+        parser.error("--percentage must be in (0, 1]")
+
+    return args
 
 
 # --------------------------------------------------
@@ -89,7 +105,7 @@ def main():
 
     # obfuscate the passwords if l33t option is present
     if args.l33t:
-        passwords = list(map(l33t, passwords))
+        passwords = list(map(lambda word: l33t(word, percent=args.percentage), passwords))
 
     for password in passwords:
         print(password)
@@ -102,22 +118,33 @@ def clean(word: str) -> str:
 
 
 # --------------------------------------------------
-def ransom(word: str) -> str:
-    """Randomly capitalize letters in word"""
+def ransom(word: str, percent: float) -> str:
+    """Randomly capitalize percent letters in word"""
 
-    return ''.join([letter.upper() if random.choice([0, 1]) else
-                    letter.lower() for letter in word])
+    ransom_word = []
+    for letter in word:
+        if random.uniform(0, 1) <= percent:
+            ransom_word.append(letter.upper() if random.choice([0, 1])
+                               else letter.lower())
+        else:
+            ransom_word.append(letter)
+
+    return ''.join(ransom_word)
 
 
 # --------------------------------------------------
-def l33t(text: str) -> str:
+def l33t(text: str, percent: float) -> str:
     """Obfuscate given text :)"""
 
     table = {'a': '@', 'A': '4', 'O': '0', 't': '+',
              'E': '3', 'I': '1', 'S': '5'}
 
-    table_sub = lambda letter: table.get(letter, letter)
-    return ''.join(map(table_sub, ransom(text))) + random.choice(string.punctuation)
+    def table_sub(letter):
+        if letter in table.keys() and random.uniform(0, 1) <= percent:
+            return table.get(letter)
+        return letter
+
+    return ''.join(map(table_sub, ransom(text, percent))) + random.choice(string.punctuation)
 
 
 # --------------------------------------------------
