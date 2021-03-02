@@ -75,10 +75,10 @@ def main():
     args = get_args()
     random.seed(args.seed)
 
-    # extract the words from all the given files, and clean them
+    # extract the words from all the given files; clean and title-case them
     words = {clean(word).title() for fh in args.file for line in fh for word in line.lower().split()}
 
-    # lambda for the length filter (see next for)
+    # lambda for the length filter (see next for loop)
     right_length = lambda word: args.min_word_len <= len(word) <= args.max_word_len
 
     passwords = []
@@ -98,7 +98,6 @@ def main():
 # --------------------------------------------------
 def clean(word: str) -> str:
     """Remove non-word characters from word"""
-
     return re.sub(r'\W', '', word)
 
 
@@ -112,13 +111,13 @@ def ransom(word: str) -> str:
 
 # --------------------------------------------------
 def l33t(text: str) -> str:
-    """Obfuscate given text"""
+    """Obfuscate given text :)"""
 
     table = {'a': '@', 'A': '4', 'O': '0', 't': '+',
              'E': '3', 'I': '1', 'S': '5'}
 
     table_sub = lambda letter: table.get(letter, letter)
-    return ''.join(map(table_sub, map(ransom, text))) + random.choice(string.punctuation)
+    return ''.join(map(table_sub, ransom(text))) + random.choice(string.punctuation)
 
 
 # --------------------------------------------------
