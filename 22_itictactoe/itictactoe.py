@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author : FabrizioPe
-Date   : 2021-03-03
+Date   : 2021-03-04
 Purpose: Interactive tic tac toe game
 """
 
@@ -16,33 +16,45 @@ class State(NamedTuple):
     board: List[str] = list('.' * 9)
     player: str = 'X'
     quit: bool = False
-    draw: bool = False
     error: Optional[str] = None
+    draw: bool = False
     winner: Optional[str] = None
+    repeat: bool = True
 
 
 # --------------------------------------------------
 def main():
     """Make a jazz noise here"""
 
-    # initial state: empty board, X turn
     state = State()
-    while not any([state.winner, state.draw]):
-        print("\033[H\033[J", end='')  # \033 ASCII escape sequence
-        print(format_board(state.board))
+    while state.repeat and not state.quit:
+        # i can't really understand why state = State() is not sufficient to
+        # clear the state: the board remains the last of the previous game
+        state = State(board=list('.' * 9))
 
-        if state.error:
-            print(state.error)
+        while not any([state.winner, state.draw]):
+            print("\033[H\033[J", end='')  # \033 ASCII escape sequence
+            print(format_board(state.board))
+
+            if state.error:
+                print(state.error)
+            if state.quit:
+                print("\033[H\033[J", end='')
+                break
+
+            state = get_move(state)
+
+            if state.winner:
+                print(f"{state.winner} has won!")
+            elif state.draw:
+                print('This is a draw.')
+
         if state.quit:
-            print("\033[H\033[J", end='')
             break
 
-        state = get_move(state)
-
-        if state.winner:
-            print(f"{state.winner} has won!")
-        elif state.draw:
-            print('This is a draw.')
+        if play_again() == 'n':
+            print("\033[H\033[J", end='')
+            state = state._replace(repeat=False)
 
 
 # --------------------------------------------------
@@ -107,6 +119,17 @@ def get_move(state: State) -> State:
         state = find_winner_or_draw(state)
 
     return state
+
+
+# --------------------------------------------------
+def play_again() -> str:
+    """Ask the user if he wants to play another turn"""
+
+    yes_or_no = input('Play again? [y/n]: ')
+    while yes_or_no not in ['y', 'n']:
+        yes_or_no = input('Please insert "y" or "n": ')
+
+    return yes_or_no
 
 
 # --------------------------------------------------
